@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- Document styling -->
+<link rel="stylesheet" href="styles.css">
+<body>
+  <script src="d3/d3.min.js"></script>
+  <script src="library.js"></script>
+  <script>
+    /* Setting document and chart properties */
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+    /* Setting the range for X */
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+    /* Setting the range for Y */
+    var y = d3.scale.linear()
+        .range([height, 0]);
+    /* Creating the X Axis */
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+    /* Creating the Y Axis */
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10, "%");
+    /* Creating an SVG canvas */
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        ;
+
+    /* Load data from file with a specific type function */
+    d3.csv("data.csv", type, function(error, data) {
+
+      /**
+       * TODO:
+       * Process the data. If filtering is required before binding the data to
+       * the DOM elements, this would be the place to do it. In what cases
+       * would we do this?
+       *
+       **/
+     data.forEach(function(d) {
+        //data.letter = parseLetter(d.letter);
+        d.frequency = +d.frequency;
+    });
+      // data.frequency = +data.frequency;
+      //return data;
+        
+      //});
+     
+
+
+
+      if (error) throw error;
+      /* Setting the domain for X and Y */
+      x.domain(data.map(function(d) { return d.letter; }));
+      y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+      /* Drawing the X and Y axes */
+      drawXAxis();
+      drawYAxis();
+      /* Drawing the Bars */
+      drawBars(data);
+
+      /**
+       * TODO:
+       * Create an on click event handler to filter data using the
+       * D3 filter method. Remember that this method requires data to
+       * be already bound to the DOM
+       *
+       **/
+    });
+
+
+
+d3.select("body")
+  .append('div')
+  .text('Letter')
+  .append('select')
+  .on("change", function(d){letter.get(this.value);});
+
+d3.select("body")
+  .append('div')
+  .text('Percentage')
+  .each(function(d){
+    d3.select(this).append('input')
+    .attr("type", 'text')
+    d3.select(this).append('text')
+  
+    
+  });
+
+  var bars = svg.append('g');
+
+    
+
+ d3.select("body")
+        .append('p')
+        .append('button')
+        .text('Filter Data')
+        .on('click', function() {
+            bars.selectAll('.bar')
+                .filter(function(d) {
+                    return d.letter;
+                })
+                .transition()
+                .duration(function(d) {
+                    return Math.random() * 1000;
+                })
+                .delay(function(d) {
+                    return d.frequency * 8000
+                })
+                .style('fill', 'red')
+                .attr('width', function(d) {
+                    return xScale(d.frequency) / 2;
+                });
+        });
+
+
+    function type(d) {
+      d.frequency = +d.frequency;
+      return d;
+    }
+  </script>
+</body>
